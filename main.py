@@ -39,6 +39,13 @@ def draw_arm(base, elbow, end_effector, target_x, target_y):
         new_theta2 = np.radians(slider_theta2.val)
         new_base, new_elbow, new_end_effector = forward_kinematics(new_theta1, new_theta2, L1, L2)
         
+        dx = new_end_effector[0] - target_x
+        dy = new_end_effector[1] - target_y
+        distance_to_target = np.hypot(dx, dy)
+        
+        if distance_to_target <= TARGET_TOLERANCE:
+            print("Target reached!")
+            
         new_x_points = (new_base[0], new_elbow[0], new_end_effector[0])
         new_y_points = (new_base[1], new_elbow[1], new_end_effector[1])
         arm_line.set_data(new_x_points, new_y_points)
@@ -52,6 +59,7 @@ def draw_arm(base, elbow, end_effector, target_x, target_y):
     
 L1 = 120
 L2 = 100
+TARGET_TOLERANCE = 8
 # max_reach = L1 + L2
 # min_reach = abs(L1 - L2)
 
