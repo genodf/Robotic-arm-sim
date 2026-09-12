@@ -12,7 +12,7 @@ def draw_arm(base, elbow, end_effector, target_x, target_y):
     y_points = [y0, y1, y2]
     
     fig, ax = plt.subplots()
-    fig.subplots_adjust(bottom=0.25)
+    fig.subplots_adjust(bottom=0.25, top=0.82)
     
     ax_theta1 = fig.add_axes([0.20, 0.12, 0.65, 0.03])
     ax_theta2 = fig.add_axes([0.20, 0.06, 0.65, 0.03])
@@ -32,10 +32,12 @@ def draw_arm(base, elbow, end_effector, target_x, target_y):
     ax.set_ylabel("y position (mm)")
     ax.set_title("2-Link Planar Robot Arm")
     ax.grid(True)
-    ax.legend()
+    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5))
+    
+    score_text = fig.text(0.98, 0.97, f"Score: {streak_score}\nTop score: {top_score}\nAttempts: {attempts}", horizontalalignment="right", verticalalignment="top")
     
     def update(value):
-        global round_active
+        global round_active, streak_score, top_score, attempts
         new_theta1 = np.radians(slider_theta1.val)
         new_theta2 = np.radians(slider_theta2.val)
         new_base, new_elbow, new_end_effector = forward_kinematics(new_theta1, new_theta2, L1, L2)
@@ -46,7 +48,12 @@ def draw_arm(base, elbow, end_effector, target_x, target_y):
         
         if round_active and distance_to_target <= TARGET_TOLERANCE:
             print("Target reached!")
+            streak_score += 1
+            attempts += 1
+            if streak_score > top_score:
+                top_score = streak_score
             round_active = False
+            score_text.set_text(f"Score: {streak_score} \n"f"Top score: {top_score} \n"f"Attempts: {attempts}")
             
         new_x_points = (new_base[0], new_elbow[0], new_end_effector[0])
         new_y_points = (new_base[1], new_elbow[1], new_end_effector[1])
@@ -63,6 +70,11 @@ L1 = 120
 L2 = 100
 TARGET_TOLERANCE = 8
 round_active = True
+
+streak_score = 0
+top_score = 0
+attempts = 0
+
 # max_reach = L1 + L2
 # min_reach = abs(L1 - L2)
 
